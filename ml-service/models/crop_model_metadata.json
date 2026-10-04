@@ -1,0 +1,206 @@
+{
+  "model_name": "KisanAI Crop Recommendation Random Forest",
+  "model_type": "RandomForestClassifier",
+  "model_status": "production",
+  "training_timestamp": "2026-10-03T16:45:29.749114",
+  "dataset": {
+    "path": "ml-service/data/raw/Crop_recommendation.csv",
+    "samples": 2200,
+    "features": 7,
+    "classes": 22,
+    "target_column": "label",
+    "feature_columns": [
+      "N",
+      "P",
+      "K",
+      "temperature",
+      "humidity",
+      "ph",
+      "rainfall"
+    ],
+    "class_distribution": {
+      "apple": 100,
+      "banana": 100,
+      "blackgram": 100,
+      "chickpea": 100,
+      "coconut": 100,
+      "coffee": 100,
+      "cotton": 100,
+      "grapes": 100,
+      "jute": 100,
+      "kidneybeans": 100,
+      "lentil": 100,
+      "maize": 100,
+      "mango": 100,
+      "mothbeans": 100,
+      "mungbean": 100,
+      "muskmelon": 100,
+      "orange": 100,
+      "papaya": 100,
+      "pigeonpeas": 100,
+      "pomegranate": 100,
+      "rice": 100,
+      "watermelon": 100
+    }
+  },
+  "feature_ranges": {
+    "N": {
+      "minimum": 0.0,
+      "maximum": 140.0
+    },
+    "P": {
+      "minimum": 5.0,
+      "maximum": 145.0
+    },
+    "K": {
+      "minimum": 5.0,
+      "maximum": 205.0
+    },
+    "temperature": {
+      "minimum": 8.825674745,
+      "maximum": 43.67549305
+    },
+    "humidity": {
+      "minimum": 14.25803981,
+      "maximum": 99.98187601
+    },
+    "ph": {
+      "minimum": 3.504752314,
+      "maximum": 9.93509073
+    },
+    "rainfall": {
+      "minimum": 20.21126747,
+      "maximum": 298.5601175
+    }
+  },
+  "hyperparameters": {
+    "n_estimators": 200,
+    "max_depth": null,
+    "min_samples_split": 5,
+    "min_samples_leaf": 1,
+    "max_features": "sqrt",
+    "random_state": 42,
+    "n_jobs": -1
+  },
+  "selection_evidence": {
+    "selection_method": "GridSearchCV",
+    "cv_folds": 5,
+    "best_cv_accuracy": 0.996023,
+    "held_out_accuracy": 0.9955,
+    "held_out_precision_weighted": 0.9957,
+    "held_out_recall_weighted": 0.9955,
+    "held_out_f1_weighted": 0.9955,
+    "held_out_log_loss": 0.0572,
+    "baseline_held_out_accuracy": 0.9932,
+    "baseline_held_out_f1_weighted": 0.9932,
+    "baseline_held_out_log_loss": 0.0527,
+    "error_analysis": {
+      "baseline_errors": 3,
+      "tuned_errors": 2,
+      "errors_fixed": 1,
+      "new_errors_introduced": 0
+    }
+  },
+  "confidence_type": "random_forest_class_probability",
+  "production_model_replaced": true,
+  "notes": [
+    "This model was selected after controlled hyperparameter tuning.",
+    "The final production artifact was trained on the complete dataset after model selection.",
+    "Held-out metrics come from the model-selection experiment using an untouched 20% test split.",
+    "The production artifact itself must not be evaluated on those same training rows as a generalization test.",
+    "Input reliability checks compare inference inputs against observed training-data ranges.",
+    "Confidence represents the Random Forest class probability and is not a calibrated probability estimate.",
+    "SHAP explanations describe model feature contributions and should not be interpreted as causal agricultural effects."
+  ],
+  "features": [
+    "N",
+    "P",
+    "K",
+    "temperature",
+    "humidity",
+    "ph",
+    "rainfall"
+  ],
+  "classes": [
+    "apple",
+    "banana",
+    "blackgram",
+    "chickpea",
+    "coconut",
+    "coffee",
+    "cotton",
+    "grapes",
+    "jute",
+    "kidneybeans",
+    "lentil",
+    "maize",
+    "mango",
+    "mothbeans",
+    "mungbean",
+    "muskmelon",
+    "orange",
+    "papaya",
+    "pigeonpeas",
+    "pomegranate",
+    "rice",
+    "watermelon"
+  ],
+  "training_samples": 2200,
+  "testing_samples": 440,
+  "test_accuracy": 0.9955,
+  "test_precision_weighted": 0.9957,
+  "test_recall_weighted": 0.9955,
+  "test_f1_weighted": 0.9955,
+  "test_log_loss": 0.0572,
+  "cv_folds": 5,
+  "cv_accuracy_mean": 0.996023,
+  "random_state": 42,
+  "n_estimators": 200,
+  "production_promoted_at": "2026-10-03T17:05:35.600544+05:30",
+  "production_model": {
+    "artifact": "crop_recommendation_random_forest.joblib",
+    "training_samples": 2200,
+    "features": [
+      "N",
+      "P",
+      "K",
+      "temperature",
+      "humidity",
+      "ph",
+      "rainfall"
+    ],
+    "classes": [
+      "apple",
+      "banana",
+      "blackgram",
+      "chickpea",
+      "coconut",
+      "coffee",
+      "cotton",
+      "grapes",
+      "jute",
+      "kidneybeans",
+      "lentil",
+      "maize",
+      "mango",
+      "mothbeans",
+      "mungbean",
+      "muskmelon",
+      "orange",
+      "papaya",
+      "pigeonpeas",
+      "pomegranate",
+      "rice",
+      "watermelon"
+    ],
+    "hyperparameters": {
+      "n_estimators": 200,
+      "max_depth": null,
+      "min_samples_split": 5,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "n_jobs": -1
+    }
+  }
+}

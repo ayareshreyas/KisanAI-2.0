@@ -1,0 +1,375 @@
+.home-page {
+  min-height: 100vh;
+  background: var(--background);
+}
+
+.home-page > section,
+.home-page > footer {
+  width: min(1120px, calc(100% - 40px));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+/* ------------------------------------------------ */
+/* Hero                                             */
+/* ------------------------------------------------ */
+
+.home-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 42px;
+  margin-bottom: 28px;
+}
+
+.home-eyebrow {
+  margin: 0 0 8px;
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.home-hero h1 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+
+.home-description {
+  max-width: 600px;
+  margin: 12px 0 0;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.home-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 9px 13px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+
+/* ------------------------------------------------ */
+/* Voice Assistant                                  */
+/* ------------------------------------------------ */
+
+.home-voice-section {
+  margin-bottom: 46px;
+}
+
+
+/* ------------------------------------------------ */
+/* Section heading                                  */
+/* ------------------------------------------------ */
+
+.section-heading {
+  margin-bottom: 18px;
+}
+
+.section-eyebrow {
+  margin: 0 0 5px;
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.section-heading h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  letter-spacing: -0.025em;
+}
+
+
+/* ------------------------------------------------ */
+/* Tool cards                                       */
+/* ------------------------------------------------ */
+
+.home-tools {
+  margin-bottom: 46px;
+}
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.tool-card {
+  position: relative;
+  display: block;
+  min-height: 190px;
+  padding: 24px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: 0 4px 16px rgba(23, 59, 42, 0.04);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.tool-card:hover {
+  transform: translateY(-3px);
+  border-color: #cbd8cb;
+  box-shadow: var(--shadow);
+}
+
+.tool-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 15px;
+  background: var(--background);
+  font-size: 1.45rem;
+}
+
+.tool-card h3 {
+  margin: 20px 0 0;
+  padding-right: 32px;
+  color: var(--text-primary);
+  font-size: 1.08rem;
+}
+
+.tool-card p {
+  margin: 8px 0 0;
+  padding-right: 28px;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.tool-arrow {
+  position: absolute;
+  right: 22px;
+  bottom: 20px;
+  color: var(--primary);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+
+/* ------------------------------------------------ */
+/* How KisanAI works                                */
+/* ------------------------------------------------ */
+
+.home-how {
+  margin-bottom: 46px;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.step-card {
+  position: relative;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.step-number {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  color: #b7c5b9;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.step-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 18px;
+  border-radius: 14px;
+  background: var(--primary-light);
+  font-size: 1.3rem;
+}
+
+.step-card h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.step-card p {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+
+/* ------------------------------------------------ */
+/* Transparency                                     */
+/* ------------------------------------------------ */
+
+.home-transparency {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 46px;
+  padding: 22px 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.transparency-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: var(--primary-light);
+  font-size: 1.1rem;
+}
+
+.home-transparency .section-eyebrow {
+  margin-bottom: 5px;
+}
+
+.home-transparency h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.home-transparency > div:last-child > p:last-child {
+  max-width: 780px;
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+
+/* ------------------------------------------------ */
+/* Footer                                           */
+/* ------------------------------------------------ */
+
+.home-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 0 32px;
+  border-top: 1px solid var(--border);
+}
+
+.footer-brand {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.home-footer p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+
+
+/* ------------------------------------------------ */
+/* Responsive                                       */
+/* ------------------------------------------------ */
+
+@media (max-width: 760px) {
+
+  .home-page > section,
+  .home-page > footer {
+    width: min(100% - 28px, 620px);
+  }
+
+  .home-hero {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 28px;
+  }
+
+  .home-status {
+    align-self: flex-start;
+  }
+
+  .tool-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-transparency {
+    margin-bottom: 36px;
+  }
+
+  .home-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+
+@media (max-width: 480px) {
+
+  .home-page > section,
+  .home-page > footer {
+    width: calc(100% - 24px);
+  }
+
+  .home-hero h1 {
+    font-size: 2rem;
+  }
+
+  .tool-card {
+    min-height: 170px;
+    padding: 20px;
+  }
+
+  .step-card {
+    padding: 20px;
+  }
+
+  .home-transparency {
+    padding: 20px;
+  }
+
+}
