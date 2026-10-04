@@ -1,170 +1,86 @@
-# KisanAI 2.0 🌾
+# 🌾 KisanAI 2.0
 
-> **Voice-first, multilingual, explainable AI for agricultural decision support.**
+AI-powered agricultural decision-support platform for crop recommendation, soil health analysis, fertilizer planning, explainable AI, and farmer-friendly reports.
 
-KisanAI 2.0 is an AI-powered agricultural decision-support platform designed to help farmers make more informed decisions using soil and environmental data.
+## Features
 
-Unlike a basic rule-based agriculture application, KisanAI 2.0 combines a trained machine-learning model with soil analysis, fertilizer optimization, explainability, multilingual voice interaction, and persistent farm analysis reports.
+- Crop recommendation using a production Random Forest model
+- Input reliability checks against training ranges
+- Soil health analysis
+- SHAP-based explainability
+- Fertilizer recommendation and optimization
+- Agricultural decision engine
+- Multilingual React interface
+- Voice-assisted navigation
+- Persistent analysis reports
+- React + Node.js + Flask + SQLite architecture
 
-The project is designed as a full-stack ML system rather than a standalone prediction notebook.
+## Machine Learning
 
----
+The production crop model is a Random Forest classifier trained on 2,200 samples across 22 crop classes.
 
-## 🚀 What KisanAI Does
+### Supported crops
 
-KisanAI 2.0 currently provides four major decision-support capabilities.
+Apple, Banana, Blackgram, Chickpea, Coconut, Coffee, Cotton, Grapes, Jute, Kidneybeans, Lentil, Maize, Mango, Mothbeans, Mungbean, Muskmelon, Orange, Papaya, Pigeonpeas, Pomegranate, Rice, Watermelon.
 
-### 🌱 Crop Recommendation
+### Production model
 
-A trained **Random Forest classifier** predicts a suitable crop based on:
+- Algorithm: Random Forest Classifier
+- Estimators: 200
+- Minimum samples split: 5
+- Maximum features: sqrt
+- Random state: 42
+- Cross-validation: 5-fold GridSearchCV
+- Best CV accuracy: 99.60%
+- Held-out accuracy: 99.55%
+- Precision: 99.57%
+- Recall: 99.55%
+- F1 score: 99.55%
+- Log loss: 0.0572
 
-- Nitrogen (N)
-- Phosphorus (P)
-- Potassium (K)
-- Temperature
-- Humidity
-- Soil pH
-- Rainfall
+The production artifact is trained on the complete dataset after controlled model selection. Held-out metrics come from the separate model-selection experiment.
 
-The production model was developed using the public `Crop_recommendation.csv` dataset containing:
+## Explainable AI
 
-- **2,200 samples**
-- **7 input features**
-- **22 crop classes**
+SHAP values are generated for crop predictions to show the relative contribution of input features. These explanations describe model behavior and are not causal agricultural claims.
 
-### 🧪 Soil Health Analysis
+## Input Reliability
 
-KisanAI evaluates important soil parameters and classifies their status, including:
+Inference inputs are compared against the training ranges:
 
-- Nitrogen
-- Phosphorus
-- Potassium
-- Soil pH
+- Nitrogen: 0–140 kg/ha
+- Phosphorus: 5–145 kg/ha
+- Potassium: 5–205 kg/ha
+- Temperature: 8.83–43.68 °C
+- Humidity: 14.26–99.98%
+- pH: 3.50–9.94
+- Rainfall: 20.21–298.56 mm
 
-The system provides human-readable soil-health information instead of exposing raw model output alone.
+Out-of-range values produce reliability warnings rather than being silently treated as normal training-distribution inputs.
 
-### 🧴 Fertilizer Recommendation
+## Fertilizer Engine
 
-The fertilizer engine combines:
+The fertilizer knowledge base supports all 22 production crop classes. Recommendations use crop nutrient requirements, soil nutrient inputs, fertilizer nutrient composition, fertilizer prices, and budget constraints.
 
-- Crop nutrient requirements
-- Current soil nutrient levels
-- Nutrient deficits
-- Fertilizer composition
-- Fertilizer cost
-- Farmer budget
+The fertilizer engine uses **kg/acre** inputs. The ML crop model and soil-health analysis use **kg/ha**. The system does not silently convert between these units; fertilizer optimization requires explicitly compatible kg/acre inputs.
 
-It then calculates a fertilizer plan while attempting to maximize nutrient coverage within the available budget.
+Fertilizer outputs are mathematical decision-support results and should not be treated as universal field prescriptions. Real agricultural recommendations should consider soil testing, local agronomy, crop stage, yield targets, climate, and local extension guidance.
 
-### 📊 Explainable Agricultural Decision Support
-
-KisanAI combines crop prediction, soil analysis, and fertilizer planning into a unified agricultural decision.
-
-The system also provides feature-level explanations using **SHAP** so users can understand which input features contributed to the crop prediction.
-
----
-
-# 🧠 Machine Learning
-
-## Production Model
-
-KisanAI currently uses a **Random Forest classifier** for crop recommendation.
-
-The model-development process included:
-
-1. Dataset inspection
-2. Data preprocessing
-3. Train/test splitting
-4. Baseline Random Forest training
-5. Cross-validation
-6. Hyperparameter tuning
-7. Hold-out evaluation
-8. Model comparison
-9. Production model promotion
-10. Metadata generation
-
-The final production model was trained on the complete 2,200-row dataset after model selection.
-
----
-
-## 📈 Model Performance
-
-The primary generalization result is based on an untouched hold-out test set.
-
-| Metric | Result |
-|---|---:|
-| Hold-out Accuracy | **99.55%** |
-| Weighted Precision | **99.57%** |
-| Weighted Recall | **99.55%** |
-| Weighted F1 | **99.55%** |
-| Log Loss | **0.0572** |
-| 5-Fold Cross-Validation | **99.60% ± 0.55%** |
-
-### Important interpretation
-
-These results describe performance on the available benchmark dataset.
-
-They **do not mean that KisanAI is 99.55% accurate on real-world farms**.
-
-Agricultural conditions can differ substantially from a benchmark dataset because of:
-
-- Regional soil differences
-- Measurement errors
-- Weather variation
-- Crop varieties
-- Seasonal conditions
-- Data distribution changes
-
-The model's prediction confidence is therefore treated as model output rather than a guarantee of agricultural success.
-
----
-
-# 🔬 Model Explainability
-
-KisanAI uses **SHAP (SHapley Additive exPlanations)** to provide feature-level explanations for crop predictions.
-
-The explanation layer helps answer questions such as:
-
-> "Which soil or environmental factors influenced this prediction?"
-
-The explanation is intended to improve transparency and user understanding.
-
-### Important limitation
-
-SHAP explanations describe how model features contributed to a prediction.
-
-They should **not be interpreted as proof of causal relationships** between a feature and crop suitability.
-
----
-
-# 🌾 Agricultural Decision Pipeline
+## Architecture
 
 ```text
-Farmer Input
-     │
-     ▼
-Soil / Environmental Data
-     │
-     ▼
-Input Validation & Reliability Checks
-     │
-     ▼
-Machine Learning Model
-     │
-     ├───────────────► Crop Prediction
-     │
-     ▼
-Agricultural Decision Engine
-     │
-     ├───────────────► Soil Health Analysis
-     │
-     └───────────────► Fertilizer Planning
-                              │
-                              ▼
-                       Budget Optimization
-                              │
-                              ▼
-                    Explainable Recommendation
-                              │
-                              ▼
-                       Saved Farm Report
+React Frontend
+      |
+      v
+Node.js / Express Backend
+      |
+      +------ SQLite Database
+      |
+      v
+Flask ML Service
+      |
+      +------ Random Forest Crop Model
+      +------ Soil Analyzer
+      +------ SHAP Explainer
+      +------ Fertilizer Engine
+      +------ Agricultural Decision Engine

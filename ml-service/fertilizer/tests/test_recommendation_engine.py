@@ -10,6 +10,8 @@ These tests verify:
 5. Nutrient coverage.
 6. Remaining nutrient deficits.
 7. No-fertilizer scenarios.
+8. Newly researched ML crop profiles.
+9. Case-sensitive crop lookup behavior.
 """
 
 import unittest
@@ -22,13 +24,13 @@ from fertilizer.recommendation_engine import (
 class TestRecommendationEngine(unittest.TestCase):
 
     def test_rice_recommendation_without_budget(self):
-        """Test a normal fertilizer recommendation."""
+        """Test a normal recommendation using the researched Rice profile."""
 
         result = generate_fertilizer_recommendation(
             crop="Rice",
-            soil_n=80,
-            soil_p=50,
-            soil_k=70,
+            soil_n=20,
+            soil_p=5,
+            soil_k=5,
         )
 
         self.assertEqual(
@@ -39,9 +41,9 @@ class TestRecommendationEngine(unittest.TestCase):
         self.assertEqual(
             result["nutrient_deficit"],
             {
-                "N": 40.0,
-                "P": 10.0,
-                "K": 0.0,
+                "N": 40.70,
+                "P": 5.60,
+                "K": 15.16,
             },
         )
 
@@ -74,15 +76,15 @@ class TestRecommendationEngine(unittest.TestCase):
 
 
     def test_budget_aware_recommendation(self):
-        """Test fertilizer recommendation with a farmer budget."""
+        """Test a fertilizer recommendation with a farmer budget."""
 
         budget = 4000
 
         result = generate_fertilizer_recommendation(
             crop="Rice",
-            soil_n=60,
-            soil_p=30,
-            soil_k=20,
+            soil_n=10,
+            soil_p=2,
+            soil_k=2,
             budget=budget,
         )
 
@@ -94,9 +96,9 @@ class TestRecommendationEngine(unittest.TestCase):
         self.assertEqual(
             result["nutrient_deficit"],
             {
-                "N": 60.0,
-                "P": 30.0,
-                "K": 40.0,
+                "N": 50.70,
+                "P": 8.60,
+                "K": 18.16,
             },
         )
 
@@ -162,9 +164,9 @@ class TestRecommendationEngine(unittest.TestCase):
 
         result = generate_fertilizer_recommendation(
             crop="Maize",
-            soil_n=50,
-            soil_p=20,
-            soil_k=20,
+            soil_n=20,
+            soil_p=5,
+            soil_k=5,
             budget=3000,
         )
 
@@ -195,9 +197,9 @@ class TestRecommendationEngine(unittest.TestCase):
 
         result = generate_fertilizer_recommendation(
             crop="Rice",
-            soil_n=60,
-            soil_p=30,
-            soil_k=20,
+            soil_n=10,
+            soil_p=2,
+            soil_k=2,
             budget=4000,
         )
 
@@ -214,13 +216,13 @@ class TestRecommendationEngine(unittest.TestCase):
 
 
     def test_no_fertilizer_required(self):
-        """Test a case where soil already meets crop requirements."""
+        """Test when soil values meet the Rice baseline profile."""
 
         result = generate_fertilizer_recommendation(
             crop="Rice",
-            soil_n=120,
-            soil_p=60,
-            soil_k=60,
+            soil_n=60.70,
+            soil_p=10.60,
+            soil_k=20.16,
         )
 
         self.assertEqual(
@@ -252,14 +254,16 @@ class TestRecommendationEngine(unittest.TestCase):
 
 
     def test_budget_with_no_fertilizer_required(self):
-        """Test a budget-aware request when no fertilizer is needed."""
+        """Test budget-aware request when no fertilizer is needed."""
+
+        budget = 4000
 
         result = generate_fertilizer_recommendation(
             crop="Rice",
-            soil_n=120,
-            soil_p=60,
-            soil_k=60,
-            budget=4000,
+            soil_n=60.70,
+            soil_p=10.60,
+            soil_k=20.16,
+            budget=budget,
         )
 
         self.assertEqual(
@@ -288,6 +292,119 @@ class TestRecommendationEngine(unittest.TestCase):
         self.assertEqual(
             optimization["remaining_budget"],
             4000.0,
+        )
+
+
+    def test_jute_recommendation(self):
+        """
+        Verify that Jute, which can be predicted by the ML model,
+        is now supported by the fertilizer requirement layer.
+        """
+
+        result = generate_fertilizer_recommendation(
+            crop="Jute",
+            soil_n=2,
+            soil_p=1,
+            soil_k=1,
+        )
+
+        self.assertEqual(
+            result["crop"],
+            "Jute",
+        )
+
+        self.assertEqual(
+            result["nutrient_deficit"],
+            {
+                "N": 6.09,
+                "P": 2.53,
+                "K": 5.72,
+            },
+        )
+
+        self.assertEqual(
+            result["optimization_mode"],
+            "cost_minimization",
+        )
+
+        self.assertTrue(
+            result["fertilizer_optimization"]["success"]
+        )
+
+
+    def test_banana_recommendation(self):
+        """Verify that a researched fruit-crop profile works."""
+
+        result = generate_fertilizer_recommendation(
+            crop="Banana",
+            soil_n=100,
+            soil_p=5,
+            soil_k=100,
+        )
+
+        self.assertEqual(
+            result["crop"],
+            "Banana",
+        )
+
+        self.assertGreater(
+            result["nutrient_deficit"]["N"],
+            0,
+        )
+
+        self.assertGreater(
+            result["nutrient_deficit"]["K"],
+            0,
+        )
+
+        self.assertTrue(
+            result["fertilizer_optimization"]["success"]
+        )
+
+
+    def test_all_ml_crop_profiles_are_available(self):
+        """
+        Ensure every crop class in the ML dataset has a
+        fertilizer requirement profile.
+        """
+
+        expected_ml_crops = {
+            "Apple",
+            "Banana",
+            "Blackgram",
+            "Chickpea",
+            "Coconut",
+            "Coffee",
+            "Cotton",
+            "Grapes",
+            "Jute",
+            "Kidneybeans",
+            "Lentil",
+            "Maize",
+            "Mango",
+            "Mothbeans",
+            "Mungbean",
+            "Muskmelon",
+            "Orange",
+            "Papaya",
+            "Pigeonpeas",
+            "Pomegranate",
+            "Rice",
+            "Watermelon",
+        }
+
+        from fertilizer.crop_requirements import (
+            get_supported_crops,
+        )
+
+        supported_crops = set(
+            get_supported_crops()
+        )
+
+        self.assertTrue(
+            expected_ml_crops.issubset(
+                supported_crops
+            )
         )
 
 

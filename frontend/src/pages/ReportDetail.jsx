@@ -672,14 +672,10 @@ function ReportDetail() {
                 </h3>
 
                 <p>
-                  We currently do not have a compatible
-                  fertilizer requirement profile for{' '}
-                  <strong>
-                    {formatCropName(
-                      fertilizerPlanning.crop
-                    )}
-                  </strong>{' '}
-                  in the KisanAI fertilizer knowledge base.
+                  Fertilizer optimization was not generated for this
+                  analysis because the required fertilizer-engine
+                  inputs were not provided in the compatible kg/acre
+                  calculation basis.
                 </p>
 
                 {fertilizerPlanning.reason && (
