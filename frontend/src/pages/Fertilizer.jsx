@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
+import API_BASE_URL from '../config/api'
 import './Fertilizer.css'
 
 const CROPS = [
@@ -255,7 +256,7 @@ function Fertilizer() {
       }
 
       const response = await fetch(
-        'http://127.0.0.1:5002/api/ml/fertilizer/recommend',
+        API_BASE_URL + '/api/ml/fertilizer/recommend',
         {
           method: 'POST',
           headers: {

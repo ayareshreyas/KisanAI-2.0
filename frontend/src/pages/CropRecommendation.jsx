@@ -2,6 +2,7 @@ import { useLocation } from 'react-router-dom'
 import { useState } from 'react'
 
 import { useLanguage } from '../i18n/LanguageContext'
+import API_BASE_URL from '../config/api'
 
 import './CropRecommendation.css'
 
@@ -48,7 +49,7 @@ function CropRecommendation() {
 
     try {
       const response = await fetch(
-        'http://localhost:5002/api/ml/agricultural-decision',
+        `${API_BASE_URL}/api/ml/agricultural-decision`,
         {
           method: 'POST',
           headers: {

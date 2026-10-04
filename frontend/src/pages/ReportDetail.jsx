@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 
+import API_BASE_URL from '../config/api'
 import './ReportDetail.css'
 
 function formatDate(dateString) {
@@ -99,7 +100,7 @@ function ReportDetail() {
         setError('')
 
         const response = await fetch(
-          `http://localhost:5002/api/analysis/history/${id}`
+          `${API_BASE_URL}/api/analysis/history/${id}`
         )
 
         const data = await response.json()

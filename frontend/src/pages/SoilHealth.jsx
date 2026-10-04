@@ -1,6 +1,7 @@
 import { useLocation, Link } from 'react-router-dom'
 import { useState } from 'react'
 import { useLanguage } from '../i18n/LanguageContext'
+import API_BASE_URL from '../config/api'
 import './SoilHealth.css'
 
 const translations = {
@@ -208,7 +209,7 @@ function SoilHealth() {
 
     try {
       const response = await fetch(
-        'http://localhost:5002/api/ml/soil/analyze',
+        `${API_BASE_URL}/api/ml/soil/analyze`,
         {
           method: 'POST',
           headers: {

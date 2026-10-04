@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
+import API_BASE_URL from '../config/api'
 import './Reports.css'
 
 function Reports() {
@@ -17,7 +18,7 @@ function Reports() {
         setError('')
 
         const response = await fetch(
-          'http://localhost:5002/api/analysis/history'
+          `${API_BASE_URL}/api/analysis/history`
         )
 
         const data = await response.json()
