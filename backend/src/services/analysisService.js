@@ -54,8 +54,6 @@ function saveAnalysis({
     JSON.stringify(inputReliability)
   )
 
-  statement.close()
-
   return {
     id: Number(result.lastInsertRowid),
     created_at: getAnalysisTimestamp(
@@ -72,8 +70,6 @@ function getAnalysisTimestamp(id) {
   `)
 
   const row = statement.get(id)
-
-  statement.close()
 
   return row?.created_at || null
 }
@@ -108,8 +104,6 @@ function getRecentAnalyses(limit = 20) {
 
   const rows = statement.all(safeLimit)
 
-  statement.close()
-
   return rows.map(formatAnalysis)
 }
 
@@ -136,8 +130,6 @@ function getAnalysisById(id) {
   `)
 
   const row = statement.get(Number(id))
-
-  statement.close()
 
   if (!row) {
     return null
