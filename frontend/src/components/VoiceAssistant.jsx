@@ -11,7 +11,7 @@ const LANGUAGE_MAP = {
 }
 
 function VoiceAssistant() {
-  const { language } = useLanguage()
+  const { language, t } = useLanguage()
   const navigate = useNavigate()
 
   const [isListening, setIsListening] = useState(false)
@@ -200,13 +200,13 @@ function VoiceAssistant() {
 
         <div>
           <p className="voice-label">
-            Voice Assistant
+            {t.home.assistantLabel}
           </p>
 
           <h3>
             {isListening
               ? 'Listening...'
-              : 'Talk to KisanAI'}
+              : t.home.assistantTitle}
           </h3>
         </div>
       </div>
@@ -218,7 +218,7 @@ function VoiceAssistant() {
             className="voice-button"
             onClick={startListening}
           >
-            🎙️ Start Talking
+            🎙️ {t.home.startTalking}
           </button>
         ) : (
           <button
