@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
 import './Navbar.css'
 
@@ -13,83 +14,45 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-inner">
-
         <div className="navbar-brand">
-          <span className="navbar-logo">
-            🌱
-          </span>
-
+          <span className="navbar-logo">🌱</span>
           <div>
             <strong>KisanAI</strong>
-
-            <span>
-              {t.home.footerTagline}
-            </span>
+            <span>{t.home.footerTagline}</span>
           </div>
         </div>
 
-
         <div className="navbar-links">
-
-          <a href="/">
-            {t.nav.home}
-          </a>
-
-          <a href="/crop-recommendation">
-            {t.nav.cropRecommendation}
-          </a>
-
-          <a href="/soil-health">
-            {t.nav.soilHealth}
-          </a>
-
-          <a href="/fertilizer">
-            {t.nav.fertilizer}
-          </a>
-
-          <a href="/reports">
-            {t.nav.reports}
-          </a>
-
+          <Link to="/">{t.nav.home}</Link>
+          <Link to="/crop-recommendation">{t.nav.cropRecommendation}</Link>
+          <Link to="/soil-health">{t.nav.soilHealth}</Link>
+          <Link to="/fertilizer">{t.nav.fertilizer}</Link>
+          <Link to="/reports">{t.nav.reports}</Link>
         </div>
 
-
         <div className="language-selector">
-
-          <span className="language-icon">
-            🌐
-          </span>
+          <span className="language-icon">🌐</span>
 
           <select
             value={language}
-            onChange={(event) =>
-              setLanguage(event.target.value)
-            }
+            onChange={(event) => setLanguage(event.target.value)}
             aria-label="Select language"
           >
             {languages.map((item) => (
-              <option
-                key={item.code}
-                value={item.code}
-              >
+              <option key={item.code} value={item.code}>
                 {item.label}
               </option>
             ))}
           </select>
 
           <span className="language-current">
-            {
-              languages.find(
-                (item) => item.code === language
-              )?.label
-            }
+            {languages.find((item) => item.code === language)?.label}
           </span>
-
         </div>
-
       </div>
     </nav>
   )
 }
 
 export default Navbar
+
