@@ -1,76 +1,69 @@
 import { useLocation } from 'react-router-dom'
 import { useState } from 'react'
+
 import { useLanguage } from '../i18n/LanguageContext'
-import './CropRecommendation.css'
 import API_BASE_URL from '../config/api'
+
+import './CropRecommendation.css'
+
+const INITIAL_FORM = {
+  N: '',
+  P: '',
+  K: '',
+  temperature: '',
+  humidity: '',
+  ph: '',
+  rainfall: '',
+}
 
 function CropRecommendation() {
   const { t } = useLanguage()
   const location = useLocation()
 
-  const voiceRequest = location.state?.voiceRequest
-  const voiceLanguage = location.state?.voiceLanguage
-  const voiceIntent = location.state?.voiceIntent
-
-  const [formData, setFormData] = useState({
-    N: '',
-    P: '',
-    K: '',
-    temperature: '',
-    humidity: '',
-    ph: '',
-    rainfall: '',
-  })
-
+  const [form, setForm] = useState(INITIAL_FORM)
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showTechnicalDetails, setShowTechnicalDetails] =
+    useState(false)
 
-  const handleChange = (event) => {
+  const voiceRequest =
+    location.state?.voiceRequest || null
+
+  function handleChange(event) {
     const { name, value } = event.target
 
-    setFormData((previous) => ({
-      ...previous,
+    setForm((current) => ({
+      ...current,
       [name]: value,
     }))
   }
 
-  const handleSubmit = async (event) => {
+  async function handleSubmit(event) {
     event.preventDefault()
 
+    setLoading(true)
     setError('')
     setResult(null)
-
-    const numericData = {
-      N: Number(formData.N),
-      P: Number(formData.P),
-      K: Number(formData.K),
-      temperature: Number(formData.temperature),
-      humidity: Number(formData.humidity),
-      ph: Number(formData.ph),
-      rainfall: Number(formData.rainfall),
-    }
-
-    const hasInvalidValue = Object.values(numericData).some(
-      (value) => Number.isNaN(value)
-    )
-
-    if (hasInvalidValue) {
-      setError('Please enter valid values in all fields.')
-      return
-    }
-
-    setLoading(true)
+    setShowTechnicalDetails(false)
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/ml/crop/predict`,
+        `${API_BASE_URL}/api/ml/agricultural-decision`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(numericData),
+          body: JSON.stringify({
+            N: Number(form.N),
+            P: Number(form.P),
+            K: Number(form.K),
+            temperature: Number(form.temperature),
+            humidity: Number(form.humidity),
+            ph: Number(form.ph),
+            rainfall: Number(form.rainfall),
+          }),
         }
       )
 
@@ -79,47 +72,68 @@ function CropRecommendation() {
       if (!response.ok || !data.success) {
         throw new Error(
           data.error ||
-            'Unable to generate crop recommendation.'
+            'Unable to generate agricultural analysis.'
         )
       }
 
-      setResult(data)
-    } catch (requestError) {
-      console.error(
-        'Crop recommendation error:',
-        requestError
-      )
-
+      setResult(data.decision)
+    } catch (submitError) {
       setError(
-        requestError.message ||
-          'Unable to connect to the KisanAI backend.'
+        submitError.message ||
+          'Unable to generate agricultural analysis.'
       )
     } finally {
       setLoading(false)
     }
   }
 
+  function handleReset() {
+    setForm(INITIAL_FORM)
+    setResult(null)
+    setError('')
+    setShowTechnicalDetails(false)
+  }
+
+  const cropRecommendation =
+    result?.crop_recommendation || null
+
+  const soilHealth =
+    result?.soil_health || null
+
+  const cropExplanation =
+    result?.crop_explanation || null
+
+  const fertilizerPlanning =
+    result?.fertilizer_planning || null
+
+  const inputReliability =
+    result?.input_reliability || null
+
+  const reliabilityIsOutsideRange =
+    inputReliability?.status ===
+    'outside_training_range'
+
   return (
     <main className="crop-page">
-
-      <section className="crop-hero">
+      <section className="crop-header">
         <div>
-          <p className="section-eyebrow">
-            {t.nav.cropRecommendation}
+          <p className="crop-eyebrow">
+            Agricultural Decision Support
           </p>
 
           <h1>
-            {t.home.cropRecommendation}
+            {t.nav.cropRecommendation}
           </h1>
 
           <p className="crop-description">
-            Enter the soil and environmental conditions
-            to get an ML-based crop recommendation.
+            Enter your farm and soil conditions to receive
+            an AI-assisted crop recommendation together with
+            soil health and model reliability information.
           </p>
         </div>
       </section>
 
-      {voiceIntent === 'crop_recommendation' && (
+      {voiceRequest && (
         <section className="voice-request-card">
           <div className="voice-request-icon">
             🎙️
@@ -133,298 +147,522 @@ function CropRecommendation() {
             <p className="voice-request-text">
               {voiceRequest}
             </p>
-
-            {voiceLanguage && (
-              <span className="voice-request-language">
-                Language: {voiceLanguage}
-              </span>
-            )}
           </div>
         </section>
       )}
 
       <section className="crop-content">
-
-        <form
-          className="crop-form-card"
-          onSubmit={handleSubmit}
-        >
+        <div className="crop-form-card">
           <div className="card-heading">
             <p className="section-eyebrow">
-              Soil & Environment
+              Farm conditions
             </p>
 
             <h2>
-              Enter farming conditions
+              Enter your farm information
             </h2>
-
-            <p>
-              Provide the values from your soil test
-              and current environmental conditions.
-            </p>
           </div>
 
-          <div className="crop-form-grid">
+          <form onSubmit={handleSubmit}>
+            <div className="form-grid">
+              <label>
+                <span>Nitrogen (N)</span>
 
-            <div className="form-field">
-              <label htmlFor="N">
-                Nitrogen (N)
+                <input
+                  type="number"
+                  name="N"
+                  value={form.N}
+                  onChange={handleChange}
+                  min="0"
+                  step="any"
+                  placeholder="e.g. 90"
+                  required
+                />
+
+                <small>kg/ha</small>
               </label>
 
-              <input
-                id="N"
-                name="N"
-                type="number"
-                step="any"
-                value={formData.N}
-                onChange={handleChange}
-                placeholder="e.g. 90"
-                required
-              />
-            </div>
+              <label>
+                <span>Phosphorus (P)</span>
 
-            <div className="form-field">
-              <label htmlFor="P">
-                Phosphorus (P)
+                <input
+                  type="number"
+                  name="P"
+                  value={form.P}
+                  onChange={handleChange}
+                  min="0"
+                  step="any"
+                  placeholder="e.g. 42"
+                  required
+                />
+
+                <small>kg/ha</small>
               </label>
 
-              <input
-                id="P"
-                name="P"
-                type="number"
-                step="any"
-                value={formData.P}
-                onChange={handleChange}
-                placeholder="e.g. 42"
-                required
-              />
-            </div>
+              <label>
+                <span>Potassium (K)</span>
 
-            <div className="form-field">
-              <label htmlFor="K">
-                Potassium (K)
+                <input
+                  type="number"
+                  name="K"
+                  value={form.K}
+                  onChange={handleChange}
+                  min="0"
+                  step="any"
+                  placeholder="e.g. 43"
+                  required
+                />
+
+                <small>kg/ha</small>
               </label>
 
-              <input
-                id="K"
-                name="K"
-                type="number"
-                step="any"
-                value={formData.K}
-                onChange={handleChange}
-                placeholder="e.g. 43"
-                required
-              />
-            </div>
+              <label>
+                <span>Temperature</span>
 
-            <div className="form-field">
-              <label htmlFor="temperature">
-                Temperature (°C)
+                <input
+                  type="number"
+                  name="temperature"
+                  value={form.temperature}
+                  onChange={handleChange}
+                  step="any"
+                  placeholder="e.g. 25"
+                  required
+                />
+
+                <small>°C</small>
               </label>
 
-              <input
-                id="temperature"
-                name="temperature"
-                type="number"
-                step="any"
-                value={formData.temperature}
-                onChange={handleChange}
-                placeholder="e.g. 25"
-                required
-              />
-            </div>
+              <label>
+                <span>Humidity</span>
 
-            <div className="form-field">
-              <label htmlFor="humidity">
-                Humidity (%)
+                <input
+                  type="number"
+                  name="humidity"
+                  value={form.humidity}
+                  onChange={handleChange}
+                  min="0"
+                  max="100"
+                  step="any"
+                  placeholder="e.g. 80"
+                  required
+                />
+
+                <small>%</small>
               </label>
 
-              <input
-                id="humidity"
-                name="humidity"
-                type="number"
-                step="any"
-                value={formData.humidity}
-                onChange={handleChange}
-                placeholder="e.g. 80"
-                required
-              />
-            </div>
+              <label>
+                <span>Soil pH</span>
 
-            <div className="form-field">
-              <label htmlFor="ph">
-                Soil pH
+                <input
+                  type="number"
+                  name="ph"
+                  value={form.ph}
+                  onChange={handleChange}
+                  min="0"
+                  max="14"
+                  step="any"
+                  placeholder="e.g. 6.5"
+                  required
+                />
+
+                <small>pH</small>
               </label>
 
-              <input
-                id="ph"
-                name="ph"
-                type="number"
-                step="any"
-                value={formData.ph}
-                onChange={handleChange}
-                placeholder="e.g. 6.5"
-                required
-              />
-            </div>
+              <label>
+                <span>Rainfall</span>
 
-            <div className="form-field form-field-wide">
-              <label htmlFor="rainfall">
-                Rainfall (mm)
+                <input
+                  type="number"
+                  name="rainfall"
+                  value={form.rainfall}
+                  onChange={handleChange}
+                  min="0"
+                  step="any"
+                  placeholder="e.g. 200"
+                  required
+                />
+
+                <small>mm</small>
               </label>
-
-              <input
-                id="rainfall"
-                name="rainfall"
-                type="number"
-                step="any"
-                value={formData.rainfall}
-                onChange={handleChange}
-                placeholder="e.g. 200"
-                required
-              />
             </div>
 
-          </div>
+            <div className="form-actions">
+              <button
+                type="submit"
+                className="primary-button"
+                disabled={loading}
+              >
+                {loading
+                  ? 'Analyzing...'
+                  : 'Analyze Farm'}
+              </button>
+
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={handleReset}
+                disabled={loading}
+              >
+                Reset
+              </button>
+            </div>
+          </form>
 
           {error && (
-            <div className="crop-error">
+            <div className="error-message">
               {error}
             </div>
           )}
-
-          <button
-            type="submit"
-            className="crop-submit-button"
-            disabled={loading}
-          >
-            {loading
-              ? 'Analyzing...'
-              : 'Get Crop Recommendation →'}
-          </button>
-
-        </form>
+        </div>
 
         {result && (
-          <section className="crop-result-card">
-
-            <div className="result-header">
-              <div>
-                <p className="section-eyebrow">
-                  KisanAI recommendation
-                </p>
-
-                <h2>
-                  {result.prediction}
-                </h2>
-              </div>
-
-              <div className="confidence-card">
-                <span>
-                  Confidence
-                </span>
-
-                <strong>
-                  {Math.round(
-                    result.confidence * 100
-                  )}
-                  %
-                </strong>
-              </div>
-            </div>
-
-            {result.explanation && (
-              <div className="explanation-section">
-
-                <div className="card-heading">
+          <div className="crop-results">
+            <section className="result-card recommendation-card">
+              <div className="result-card-header">
+                <div>
                   <p className="section-eyebrow">
-                    Explainable AI
+                    AI recommendation
                   </p>
+
+                  <h2>
+                    Recommended Crop
+                  </h2>
+                </div>
+
+                <span className="result-icon">
+                  🌾
+                </span>
+              </div>
+
+              <div className="recommendation-result">
+                <div>
+                  <span className="result-label">
+                    Recommended crop
+                  </span>
 
                   <h3>
-                    Why this prediction?
+                    {cropRecommendation?.crop || '—'}
                   </h3>
+                </div>
+
+                <div className="confidence-block">
+                  <span className="result-label">
+                    Model confidence
+                  </span>
+
+                  <strong>
+                    {cropRecommendation
+                      ? `${(
+                          cropRecommendation.confidence *
+                          100
+                        ).toFixed(1)}%`
+                      : '—'}
+                  </strong>
+                </div>
+              </div>
+            </section>
+
+            {inputReliability && (
+              <section
+                className={`result-card reliability-card ${
+                  reliabilityIsOutsideRange
+                    ? 'reliability-warning'
+                    : 'reliability-success'
+                }`}
+              >
+                <div className="result-card-header">
+                  <div>
+                    <p className="section-eyebrow">
+                      Model reliability
+                    </p>
+
+                    <h2>
+                      Input Reliability
+                    </h2>
+                  </div>
+
+                  <span className="reliability-status-icon">
+                    {reliabilityIsOutsideRange
+                      ? '⚠️'
+                      : '✓'}
+                  </span>
+                </div>
+
+                <div className="reliability-summary">
+                  <strong>
+                    {reliabilityIsOutsideRange
+                      ? 'Prediction should be interpreted cautiously'
+                      : 'Inputs are within the model training range'}
+                  </strong>
 
                   <p>
-                    These feature contributions show
-                    which inputs influenced the model's
-                    prediction.
+                    {inputReliability.message}
                   </p>
+                </div>
+
+                {inputReliability.warnings?.length > 0 && (
+                  <div className="reliability-warnings">
+                    {inputReliability.warnings.map(
+                      (warning) => (
+                        <div
+                          className="reliability-warning-item"
+                          key={warning.feature}
+                        >
+                          <strong>
+                            {warning.label}
+                          </strong>
+
+                          <span>
+                            Supplied value: {warning.value}{' '}
+                            {warning.unit}
+                          </span>
+
+                          <span>
+                            Training maximum:{' '}
+                            {warning.training_maximum}{' '}
+                            {warning.unit}
+                          </span>
+                        </div>
+                      )
+                    )}
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  className="technical-details-button"
+                  onClick={() =>
+                    setShowTechnicalDetails(
+                      (current) => !current
+                    )
+                  }
+                >
+                  {showTechnicalDetails
+                    ? 'Hide technical details'
+                    : 'Show technical details'}
+                </button>
+
+                {showTechnicalDetails && (
+                  <div className="technical-details">
+                    <p>
+                      These ranges represent the minimum and
+                      maximum values observed in the dataset
+                      used to train the crop recommendation
+                      model. They are not agricultural
+                      recommendations or safe farming limits.
+                    </p>
+
+                    <div className="technical-feature-list">
+                      {inputReliability.checked_features?.map(
+                        (feature) => (
+                          <div
+                            className="technical-feature"
+                            key={feature.feature}
+                          >
+                            <span>
+                              {feature.label}
+                            </span>
+
+                            <span>
+                              {feature.value}{' '}
+                              {feature.unit}
+                            </span>
+
+                            <span>
+                              Observed training range:{' '}
+                              {feature.training_minimum}
+                              {' – '}
+                              {feature.training_maximum}{' '}
+                              {feature.unit}
+                            </span>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                )}
+              </section>
+            )}
+
+            {soilHealth && (
+              <section className="result-card">
+                <div className="result-card-header">
+                  <div>
+                    <p className="section-eyebrow">
+                      Soil analysis
+                    </p>
+
+                    <h2>
+                      Soil Health
+                    </h2>
+                  </div>
+
+                  <span className="result-icon">
+                    🌱
+                  </span>
+                </div>
+
+                <div className="soil-grid">
+                  <div className="soil-item">
+                    <span>Nitrogen</span>
+
+                    <strong>
+                      {soilHealth.nitrogen?.status}
+                    </strong>
+
+                    <small>
+                      {soilHealth.nitrogen?.value}{' '}
+                      {soilHealth.nitrogen?.unit}
+                    </small>
+                  </div>
+
+                  <div className="soil-item">
+                    <span>Phosphorus</span>
+
+                    <strong>
+                      {soilHealth.phosphorus?.status}
+                    </strong>
+
+                    <small>
+                      {soilHealth.phosphorus?.value}{' '}
+                      {soilHealth.phosphorus?.unit}
+                    </small>
+                  </div>
+
+                  <div className="soil-item">
+                    <span>Potassium</span>
+
+                    <strong>
+                      {soilHealth.potassium?.status}
+                    </strong>
+
+                    <small>
+                      {soilHealth.potassium?.value}{' '}
+                      {soilHealth.potassium?.unit}
+                    </small>
+                  </div>
+
+                  <div className="soil-item">
+                    <span>pH</span>
+
+                    <strong>
+                      {soilHealth.ph?.status}
+                    </strong>
+
+                    <small>
+                      {soilHealth.ph?.value}{' '}
+                      {soilHealth.ph?.unit}
+                    </small>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {cropExplanation && (
+              <section className="result-card">
+                <div className="result-card-header">
+                  <div>
+                    <p className="section-eyebrow">
+                      Explainable AI
+                    </p>
+
+                    <h2>
+                      Why the model made this prediction
+                    </h2>
+                  </div>
+
+                  <span className="result-icon">
+                    🔍
+                  </span>
                 </div>
 
                 <div className="explanation-list">
+                  {cropExplanation.feature_contributions?.map(
+                    (item) => (
+                      <div
+                        className="explanation-item"
+                        key={item.feature}
+                      >
+                        <div>
+                          <strong>
+                            {item.feature}
+                          </strong>
 
-                  {result.explanation.feature_contributions?.map(
-                    (item) => {
-                      const contribution =
-                        Number(item.contribution)
-
-                      const absoluteContribution =
-                        Math.abs(contribution)
-
-                      let influence = 'Lower influence'
-
-                      if (
-                        absoluteContribution >= 0.1
-                      ) {
-                        influence =
-                          'Strong influence'
-                      } else if (
-                        absoluteContribution >= 0.05
-                      ) {
-                        influence =
-                          'Moderate influence'
-                      }
-
-                      return (
-                        <div
-                          className="explanation-item"
-                          key={item.feature}
-                        >
-                          <div>
-                            <strong>
-                              {item.feature}
-                            </strong>
-
-                            <span>
-                              Value: {item.value}
-                            </span>
-                          </div>
-
-                          <div className="explanation-impact">
-                            <span>
-                              {influence}
-                            </span>
-
-                            <strong>
-                              {contribution > 0
-                                ? '+'
-                                : ''}
-                              {contribution.toFixed(3)}
-                            </strong>
-                          </div>
+                          <span>
+                            Value: {item.value}
+                          </span>
                         </div>
-                      )
-                    }
+
+                        <span
+                          className={
+                            item.contribution >= 0
+                              ? 'positive-contribution'
+                              : 'negative-contribution'
+                          }
+                        >
+                          {item.contribution >= 0
+                            ? '+'
+                            : ''}
+                          {item.contribution.toFixed(4)}
+                        </span>
+                      </div>
+                    )
                   )}
-
                 </div>
-
-                <div className="explanation-note">
-                  SHAP-based feature contribution explains
-                  the model's prediction. It should not be
-                  interpreted as a direct agronomic
-                  prescription.
-                </div>
-
-              </div>
+              </section>
             )}
 
-          </section>
+            {fertilizerPlanning && (
+              <section className="result-card">
+                <div className="result-card-header">
+                  <div>
+                    <p className="section-eyebrow">
+                      Fertilizer planning
+                    </p>
+
+                    <h2>
+                      Fertilizer Planning
+                    </h2>
+                  </div>
+
+                  <span className="result-icon">
+                    🧪
+                  </span>
+                </div>
+
+                {fertilizerPlanning.available ? (
+                  <div className="planning-success">
+                    Fertilizer optimization is available
+                    for this analysis.
+                  </div>
+                ) : (
+                  <div className="planning-info">
+                    <strong>
+                      Planning not generated yet
+                    </strong>
+
+                    <p>
+                      {fertilizerPlanning.reason}
+                    </p>
+                  </div>
+                )}
+              </section>
+            )}
+
+            <section className="decision-support-notice">
+              <span>ℹ️</span>
+
+              <p>
+                KisanAI provides AI-assisted decision
+                support. Recommendations should be
+                considered together with local agricultural
+                knowledge, soil testing, weather conditions,
+                and expert advice.
+              </p>
+            </section>
+          </div>
         )}
-
       </section>
-
     </main>
   )
 }
